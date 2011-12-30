@@ -10,7 +10,7 @@ dir		   db 0
 bullet_f   db 0   
 exit_f     db 0
 hero_pos   dw 60300
-bullet_pos dw 00000
+bullet_pos dw 60330
 oldInt9    dw 2 dup(?)  
 welcome    db 'WELCOME$'
 exit_msg   db 'BYE BYE YA 7ALAWA :)$'
@@ -240,7 +240,7 @@ draw_bullet:
 	mov ax, 0a000h
 	mov es, ax
 	lea bx, bullet_pos
-	;sub word ptr [bx],6*320          ; decrement the bullet pos
+	sub word ptr [bx],6*320          ; decrement the bullet pos
 	mov si,word ptr [bx]             
 	mov byte ptr es:[si], 1
 	mov byte ptr es:[si-320], 1 
@@ -332,12 +332,14 @@ handle_down:
 ;	call repaint
 	jmp go_out
 handle_space:
-    lea di, bullet_f
-    mov [di],1h
-	lea di, hero_pos      
-	lea si, bullet_pos
-	mov ax, word ptr[di]                 
-	mov word ptr[si], ax
+    lea bx, bullet_f
+    cmp byte ptr [bx],01h
+    je  go_out
+    mov byte ptr [bx],01h
+	lea si, hero_pos      
+	lea bx, bullet_pos
+	mov ax, word ptr[si]                 
+	mov word ptr[bx], ax
 ;	mov si, word ptr[di]
 ;	mov ax, 0a000h
 ;	mov es, ax
@@ -369,7 +371,7 @@ disp_msg:         ; dx holds the string's address
     mov  bh,0
     mov  dh,20             ; row
     mov  dl,20             ; column
-    int  10
+    int  10h
     pop  dx
     mov  ah,9
     int  21h 
